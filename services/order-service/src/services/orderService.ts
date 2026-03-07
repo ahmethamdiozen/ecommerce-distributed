@@ -1,6 +1,5 @@
 import redis from "../config/redis"
 import { producer } from "../config/kafka"
-import { timeStamp } from "node:console";
 
 const LOCK_TTL = 5000;
 
@@ -27,12 +26,20 @@ export const createOrder = async (
     try {
         // 3. Stock check 
         const stock = await redis.get(`stock:${productId}`);
-        if (!stock || parseInt(stock) < quantity) {
-            return { success: false, message: "Insufficient stock"};
+        const stockCount = parseInt(stock || "0");
+        const quantityCount = parseInt(String(quantity));
+
+        console.log('Stock:', stock);
+        console.log('StockCount:', stockCount);
+        console.log('QuantityCount:', quantityCount);
+        console.log('ProductId:', productId);
+
+        if (stockCount < quantityCount) {
+            return { success: false, message: "Insufficent stock"}
         }
 
         // 4. Reduce stock
-        await redis.decrby(`stock:${productId}`, quantity);
+        await redis.decrby(`stock:${productId}`, quantityCount);
 
         // 5.  Send event to Kafka
         await producer.send({
