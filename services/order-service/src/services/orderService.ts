@@ -27,19 +27,18 @@ export const createOrder = async (
         // 3. Stock check 
         const stock = await redis.get(`stock:${productId}`);
         const stockCount = parseInt(stock || "0");
-        const quantityCount = parseInt(String(quantity));
 
         console.log('Stock:', stock);
         console.log('StockCount:', stockCount);
-        console.log('QuantityCount:', quantityCount);
+        console.log('QuantityCount:', quantity);
         console.log('ProductId:', productId);
 
-        if (stockCount < quantityCount) {
+        if (stockCount < quantity) {
             return { success: false, message: "Insufficent stock"}
         }
 
         // 4. Reduce stock
-        await redis.decrby(`stock:${productId}`, quantityCount);
+        await redis.decrby(`stock:${productId}`, quantity);
 
         // 5.  Send event to Kafka
         await producer.send({
