@@ -7,9 +7,6 @@ const redis = new Redis({
 
 redis.on("connect", () => {
     console.log("Redis connection established ");
-    redis.get('stock:product-1').then(val => {
-    console.log('Test - stock:product-1:', val);
-  });
 });
 
 redis.on("error", (err) => {

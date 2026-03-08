@@ -1,5 +1,6 @@
 import redis from "../config/redis"
 import { producer } from "../config/kafka"
+import { publishToQueue } from "../config/rabbitmq";
 
 const LOCK_TTL = 5000;
 
@@ -28,11 +29,6 @@ export const createOrder = async (
         const stock = await redis.get(`stock:${productId}`);
         const stockCount = parseInt(stock || "0");
 
-        console.log('Stock:', stock);
-        console.log('StockCount:', stockCount);
-        console.log('QuantityCount:', quantity);
-        console.log('ProductId:', productId);
-
         if (stockCount < quantity) {
             return { success: false, message: "Insufficent stock"}
         }
@@ -57,7 +53,17 @@ export const createOrder = async (
                 },
             ],
         });
+        await publishToQueue("notification-queue", {
+            type: "ORDER_CONFIRMATION",
+            userId,
+            orderId,
+            productId,
+            quantity,
+            timestamp: new Date().toISOString(),
+        });
+
         await redis.set(`idempotency:${orderId}`, "processed", "EX", 86400);
+        
         
         return { success: true, message: "Order created", orderId};
 
