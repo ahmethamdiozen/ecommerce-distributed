@@ -1,7 +1,9 @@
 import amqp from "amqplib"
 
 export const startNotificationConsumer = async (): Promise<void> => {
-    const connection = await amqp.connect("amqp://admin:admin123@localhost:5672");
+    const connection = await amqp.connect(
+        process.env.RABBITMQ_URL || "amqp://admin:admin123@localhost:5672"
+    );
     const channel = await connection.createChannel();
     await channel.assertQueue("notification-queue", { durable: true });
     channel.prefetch(1);
