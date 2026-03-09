@@ -1,5 +1,4 @@
-import amqp from "amqplib"
-
+import amqp from "amqplib";
 
 let channel: amqp.Channel;
 
@@ -8,9 +7,7 @@ export const connectRabbitMQ = async (): Promise<void> => {
         process.env.RABBITMQ_URL || "amqp://admin:admin123@localhost:5672"
     );
     channel = await connection.createChannel();
-
-    await channel.assertQueue("notification-queue", { durable: true });
-
+    // Order service only publishes, queue is owned and asserted by notification-service
     console.log("RabbitMQ connection established");
 };
 
