@@ -51,6 +51,25 @@ services:
       retries: 10
       start_period: 30s
 
+  postgres:
+    image: postgres:16-alpine
+    platform: linux/arm64
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: inventory
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d inventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   order-service:
     build:
       context: ../services/order-service
@@ -67,7 +86,7 @@ services:
       redis:
         condition: service_started
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
 
   inventory-service:
     build:
@@ -75,8 +94,11 @@ services:
     container_name: inventory-service
     environment:
       KAFKA_BROKER: kafka:9092
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/inventory
     depends_on:
       kafka:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   notification-service:
@@ -88,3 +110,6 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -13,8 +13,12 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@types/pg": "^8.18.0",
     "ioredis": "^5.10.0",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "pg": "^8.20.0",
+    "prisma": "^5.22.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.5",
