@@ -1,0 +1,220 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+
+.app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+header h1 { font-size: 2rem; color: #f8fafc; }
+header p { color: #94a3b8; margin-top: 8px; }
+
+main {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+}
+
+.left-panel { display: flex; flex-direction: column; gap: 24px; }
+
+.panel {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.panel h2 { font-size: 1.1rem; margin-bottom: 16px; color: #f1f5f9; }
+
+/* Stock Panel */
+.stock-list { display: flex; flex-direction: column; gap: 12px; }
+
+.stock-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0f172a;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.product-name { font-size: 0.9rem; color: #94a3b8; }
+.stock-count { font-size: 1.2rem; font-weight: bold; }
+
+.stock-item button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.stock-item button:hover { background: #2563eb; }
+
+.seed-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.seed-control input {
+    width: 80px;
+    padding: 4px 8px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #e2e8f0;
+}
+
+/* Order Form */
+.form { display: flex; flex-direction: column; gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 0.85rem; color: #94a3b8; }
+
+.field input, .field select {
+    padding: 8px 12px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+}
+
+.submit-btn {
+    padding: 10px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+.submit-btn:hover { background: #2563eb; }
+.submit-btn:disabled { background: #475569; cursor: not-allowed; }
+
+.status {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.status.success { background: #14532d; color: #86efac; }
+.status.error { background: #450a0a; color: #fca5a5; }
+
+/* Order List */
+.order-list { display: flex; flex-direction: column; gap: 10px; max-height: 700px; overflow-y: auto; }
+
+.order-item {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.order-id { font-size: 0.8rem; color: #64748b; font-family: monospace; }
+.order-date { font-size: 0.8rem; color: #475569; }
+
+.order-details {
+    display: flex;
+    gap: 16px;
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.event-type {
+    margin-left: auto;
+    background: #1d4ed8;
+    color: #bfdbfe;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+/* Updated Stock Panel */
+.stock-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.stock-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.stock-actions button {
+    flex: 1;
+    padding: 5px 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.btn-add { background: #16a34a; color: white; }
+.btn-add:hover { background: #15803d; }
+
+.btn-subtract { background: #dc2626; color: white; }
+.btn-subtract:hover { background: #b91c1c; }
+
+.stock-set {
+    display: flex;
+    gap: 8px;
+}
+
+.stock-set input {
+    flex: 1;
+    padding: 5px 8px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+}
+
+.btn-set {
+    background: #7c3aed;
+    color: white;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-set:hover { background: #6d28d9; }
+
+.stock-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+}
