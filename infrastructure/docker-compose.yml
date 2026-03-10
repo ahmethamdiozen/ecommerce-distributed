@@ -80,12 +80,15 @@ services:
       REDIS_HOST: redis
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/inventory
     depends_on:
       kafka:
         condition: service_healthy
       redis:
         condition: service_started
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   inventory-service:

@@ -1,42 +1,44 @@
-import redis from "../config/redis"
-import { producer } from "../config/kafka"
+import redis from "../config/redis";
+import { producer } from "../config/kafka";
 import { publishToQueue } from "../config/rabbitmq";
+import { PrismaClient } from "@prisma/client";
 
+const prisma = new PrismaClient();
 const LOCK_TTL = 5000;
 
 export const createOrder = async (
     userId: string,
     productId: string,
     quantity: number
-): Promise<{ success: boolean; message: string; orderId?: string}> => {
+): Promise<{ success: boolean; message: string; orderId?: string }> => {
     const lockKey = `lock:product:${productId}`;
     const orderId = `order:${userId}:${Date.now()}`;
 
-    // 1. Idempotency check
+    // 1. Idempotency check - prevent duplicate order processing
     const alreadyProcessed = await redis.get(`idempotency:${orderId}`);
     if (alreadyProcessed) {
-        return { success: false, message: "This order already processed"};
+        return { success: false, message: "This order already processed" };
     }
 
-    // 2. Get distributed lock
+    // 2. Acquire distributed lock to prevent race conditions
     const lock = await redis.set(lockKey, orderId, "PX", LOCK_TTL, "NX");
     if (!lock) {
-        return { success: false, message: "The product is in process, try again"};
+        return { success: false, message: "The product is in process, try again" };
     }
 
     try {
-        // 3. Stock check 
+        // 3. Check current stock level
         const stock = await redis.get(`stock:${productId}`);
         const stockCount = parseInt(stock || "0");
 
         if (stockCount < quantity) {
-            return { success: false, message: "Insufficent stock"}
+            return { success: false, message: "Insufficient stock" };
         }
 
-        // 4. Reduce stock
+        // 4. Atomically reduce stock
         await redis.decrby(`stock:${productId}`, quantity);
 
-        // 5.  Send event to Kafka
+        // 5. Publish OrderCreated event to Kafka for inventory service
         await producer.send({
             topic: "order-created",
             messages: [
@@ -53,6 +55,8 @@ export const createOrder = async (
                 },
             ],
         });
+
+        // 6. Publish notification task to RabbitMQ
         await publishToQueue("notification-queue", {
             type: "ORDER_CONFIRMATION",
             userId,
@@ -62,16 +66,36 @@ export const createOrder = async (
             timestamp: new Date().toISOString(),
         });
 
+        // 7. Mark order as processed for idempotency (TTL: 24h)
         await redis.set(`idempotency:${orderId}`, "processed", "EX", 86400);
-        
-        
-        return { success: true, message: "Order created", orderId};
+
+        return { success: true, message: "Order created", orderId };
 
     } finally {
-        // 7. Release lock every situation
+        // 8. Always release lock, verify ownership before deleting
         const currentLock = await redis.get(lockKey);
         if (currentLock === orderId) {
             await redis.del(lockKey);
         }
     }
+};
+
+// Fetch all order events from PostgreSQL
+export const getOrders = async () => {
+    const orders = await prisma.orderEvent.findMany({
+        orderBy: { createdAt: "desc" }
+    });
+    return { success: true, orders };
+};
+
+// Get current stock level from Redis
+export const getStock = async (productId: string) => {
+    const stock = await redis.get(`stock:${productId}`);
+    return { success: true, productId, stock: parseInt(stock || "0") };
+};
+
+// Set stock level in Redis (used for testing and seeding)
+export const setStock = async (productId: string, quantity: number) => {
+    await redis.set(`stock:${productId}`, quantity);
+    return { success: true, productId, stock: quantity };
 };
