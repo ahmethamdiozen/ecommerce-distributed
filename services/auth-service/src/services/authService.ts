@@ -23,7 +23,7 @@ export const register = async (email: string, password: string) => {
 
     const payload = { userId: user.id, email: user.email, role: user.role};
     const accessToken = generateAccessToken(payload);
-    const refreshToken = generateRefreshToken(payload);
+    const refreshToken = await generateRefreshToken(payload);
 
     return { accessToken, refreshToken, user: { id: user.id, email: user.email, role: user.role }};
 };

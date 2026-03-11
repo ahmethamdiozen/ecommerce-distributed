@@ -20,6 +20,7 @@ out/
 .env.test.local
 .env.production.local
 .env.sample
+*.env
 
 # OS files
 .DS_Store

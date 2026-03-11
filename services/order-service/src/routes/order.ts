@@ -1,20 +1,22 @@
 import { Router, Request, Response } from "express";
 import { createOrder, getOrders } from "../services/orderService";
+import { authenticate, AuthRequest } from "../middleware/auth";
 
 const router = Router();
 
 // Get order history from PostgreSQL
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", authenticate, async (req: AuthRequest, res: Response) => {
     const result = await getOrders();
     res.status(200).json(result);
 });
 
-// Create a new order
-router.post("/", async (req: Request, res: Response) => {
-    const { userId, productId, quantity } = req.body;
+// Create a new order - userId comes from JWT token, not request body
+router.post("/", authenticate, async (req: AuthRequest, res: Response) => {
+    const { productId, quantity } = req.body;
+    const userId = req.user!.email; // Use email from token as userId
 
-    if (!userId || !productId || !quantity) {
-        res.status(400).json({ error: "userId, productId and quantity is required" });
+    if (!productId || !quantity) {
+        res.status(400).json({ error: "productId and quantity are required" });
         return;
     }
 

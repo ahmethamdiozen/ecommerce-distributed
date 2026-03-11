@@ -42,8 +42,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -58,17 +58,31 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: inventory
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d inventory"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d inventory"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  auth-service:
+    build:
+      context: ../services/auth-service
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/inventory
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   order-service:
     build:
@@ -79,8 +93,9 @@ services:
     environment:
       REDIS_HOST: redis
       KAFKA_BROKER: kafka:9092
-      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672
-      DATABASE_URL: postgresql://admin:admin123@postgres:5432/inventory
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/inventory
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
     depends_on:
       kafka:
         condition: service_healthy
@@ -97,7 +112,7 @@ services:
     container_name: inventory-service
     environment:
       KAFKA_BROKER: kafka:9092
-      DATABASE_URL: postgresql://admin:admin123@postgres:5432/inventory
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/inventory
     depends_on:
       kafka:
         condition: service_healthy
@@ -109,23 +124,9 @@ services:
       context: ../services/notification-service
     container_name: notification-service
     environment:
-      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672
+      RABBITMQ_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@rabbitmq:5672
     depends_on:
       rabbitmq:
-        condition: service_healthy
-
-  auth-service:
-    build:
-      context: ../services/auth-service
-    container_name: auth-service
-    ports:
-      - "3001:3001"
-    environment:
-      DATABASE_URL: postgresql://admin:admin123@postgres:5432/inventory
-      JWT_ACCESS_SECRET: prod-access-secret
-      JWT_REFRESH_SECRET: prod-refresh-secret
-    depends_on:
-      postgres:
         condition: service_healthy
 
 volumes:
