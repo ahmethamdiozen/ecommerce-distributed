@@ -114,5 +114,19 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  auth-service:
+    build:
+      context: ../services/auth-service
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/inventory
+      JWT_ACCESS_SECRET: prod-access-secret
+      JWT_REFRESH_SECRET: prod-refresh-secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
