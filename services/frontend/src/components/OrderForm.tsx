@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 
 interface OrderFormProps {
     onOrderCreated: () => void;
@@ -20,7 +20,7 @@ const OrderForm = ({ onOrderCreated }: OrderFormProps) => {
         setStatus(null);
 
         try {
-            const res = await axios.post("http://localhost:3000/orders", {
+            const res = await api.post("http://localhost:3000/orders", {
                 userId,
                 productId,
                 quantity

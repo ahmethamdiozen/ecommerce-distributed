@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../config/axios";
 
 interface Order {
     id: number;
@@ -19,7 +19,7 @@ const OrderList = ({ refresh }: OrderListProps) => {
     const [orders, setOrders] = useState<Order[]>([]);
 
     const fetchOrders = async () => {
-        const res = await axios.get("http://localhost:3000/orders");
+        const res = await api.get("http://localhost:3000/orders");
         setOrders(res.data.orders);
     };
 
