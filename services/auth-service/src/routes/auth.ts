@@ -1,10 +1,11 @@
 import { Router, Request, Response } from "express";
 import { register, login, refresh, logout } from "../services/authService";
 import { authCounter } from "../config/metrics";
+import { authRateLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
 
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", authRateLimiter, async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -22,7 +23,7 @@ router.post("/register", async (req: Request, res: Response) => {
     }
 });
 
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", authRateLimiter, async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
