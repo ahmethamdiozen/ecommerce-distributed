@@ -6,8 +6,8 @@ export const register = new Registry();
 collectDefaultMetrics({ register });
 
 // Total order attempts
-export const orderCount = new Counter({
-    name: "order_total",
+export const orderCounter = new Counter({
+    name: "orders_total",
     help: "Total number of order attempts",
     labelNames: ["status"], // status: success | failed
     registers: [register],
@@ -21,10 +21,10 @@ export const orderDuration = new Histogram({
     registers: [register],
 });
 
-// Active redis locks
+// Active Redis locks
 export const redisLockCounter = new Counter({
-    name: "redis_lock_total",
+    name: "redis_locks_total",
     help: "Total Redis lock acquisitions",
-    labelNames: ["result"], // result: acquires | failed
+    labelNames: ["result"], // result: acquired | failed
     registers: [register],
 });
