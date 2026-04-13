@@ -56,6 +56,9 @@ services:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       REDIS_URL: ${REDIS_URL}
+    networks:
+      - default
+      - coolify
     deploy:
       resources:
         limits:
@@ -80,6 +83,9 @@ services:
         condition: service_healthy
       inventory-service:
         condition: service_started
+    networks:
+      - default
+      - coolify
     deploy:
       resources:
         limits:
@@ -95,6 +101,9 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    networks:
+      - default
+      - coolify
     deploy:
       resources:
         limits:
@@ -134,3 +143,8 @@ services:
 volumes:
   kafka_data:
   rabbitmq_data:
+
+networks:
+  default:
+  coolify:
+    external: true
