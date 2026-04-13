@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import axios from "axios";
+import { AUTH_URL } from "../config/api";
 
 interface User {
     id: number;
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (email: string, password: string) => {
-        const res = await axios.post("http://localhost:3001/auth/login", { email, password });
+        const res = await axios.post(`${AUTH_URL}/auth/login`, { email, password });
         const { accessToken, refreshToken, user } = res.data;
 
         localStorage.setItem("accessToken", accessToken);
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const register = async (email: string, password: string) => {
-        const res = await axios.post("http://localhost:3001/auth/register", { email, password });
+        const res = await axios.post(`${AUTH_URL}/auth/register`, { email, password });
         const { accessToken, refreshToken, user } = res.data;
 
         localStorage.setItem("accessToken", accessToken);
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (refreshToken) {
             try {
-                await axios.post("http://localhost:3001/auth/logout", { refreshToken });
+                await axios.post(`${AUTH_URL}/auth/logout`, { refreshToken });
             } catch {
                 // Even if logout request fails, clear local state
             }

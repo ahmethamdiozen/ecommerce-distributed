@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../config/axios";
+import { ORDER_URL } from "../config/api";
 
 interface StockPanelProps {
     refresh: number;
@@ -15,7 +16,7 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
     const fetchStocks = async () => {
         const results: Record<string, number> = {};
         for (const p of PRODUCTS) {
-            const res = await api.get(`http://localhost:3000/stock/${p}`);
+            const res = await api.get(`${ORDER_URL}/stock/${p}`);
             results[p] = res.data.stock;
         }
         setStocks(results);
@@ -24,14 +25,14 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
     const addStock = async (productId: string) => {
         const current = stocks[productId] || 0;
         const newQty = current + seedQty;
-        await api.post(`http://localhost:3000/stock/${productId}`, { quantity: newQty });
+        await api.post(`${ORDER_URL}/stock/${productId}`, { quantity: newQty });
         fetchStocks();
     };
 
     const subtractStock = async (productId: string) => {
         const current = stocks[productId] || 0;
         const newQty = Math.max(0, current - seedQty);
-        await api.post(`http://localhost:3000/stock/${productId}`, { quantity: newQty });
+        await api.post(`${ORDER_URL}/stock/${productId}`, { quantity: newQty });
         fetchStocks();
     };
 
@@ -40,7 +41,7 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
         // Do nothing if input is empty
         if (raw === undefined || raw === "") return;
         const qty = Number(raw);
-        await api.post(`http://localhost:3000/stock/${productId}`, { quantity: qty });
+        await api.post(`${ORDER_URL}/stock/${productId}`, { quantity: qty });
         setSetValues(prev => ({ ...prev, [productId]: "" }));
         fetchStocks();
     };

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AUTH_URL } from "./api";
 
 const api = axios.create();
 
@@ -29,7 +30,7 @@ api.interceptors.response.use(
             }
 
             try {
-                const res = await axios.post("http://localhost:3001/auth/refresh", { refreshToken });
+                const res = await axios.post(`${AUTH_URL}/auth/refresh`, { refreshToken });
                 const newToken = res.data.accessToken;
 
                 localStorage.setItem("accessToken", newToken);
