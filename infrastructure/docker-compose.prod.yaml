@@ -29,24 +29,23 @@ services:
       start_period: 45s
 
   rabbitmq:
-    image: rabbitmq:3.12-management-alpine
+    image: rabbitmq:3.12-alpine
     restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
-      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: "0.4"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 384M
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
       interval: 15s
       timeout: 10s
-      retries: 10
-      start_period: 30s
+      retries: 15
+      start_period: 90s
 
   auth-service:
     build:
