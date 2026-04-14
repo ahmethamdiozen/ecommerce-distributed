@@ -7,6 +7,11 @@ import {
     revokeRefreshToken
 } from "./tokenService";
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean);
+
 export const register = async (email: string, password: string) => {
     // Check if user already exists
     const existing = await prisma.user.findUnique({ where: { email }});
@@ -17,8 +22,10 @@ export const register = async (email: string, password: string) => {
     // Hash password with bcrypt (salt rounds: 10)
     const hashed = await bcrypt.hash(password, 10);
 
+    const role = ADMIN_EMAILS.includes(email.toLowerCase()) ? "admin" : "user";
+
     const user = await prisma.user.create({
-        data: { email, password: hashed}
+        data: { email, password: hashed, role }
     });
 
     const payload = { userId: user.id, email: user.email, role: user.role};

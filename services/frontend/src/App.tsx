@@ -1,61 +1,43 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute from "./components/AdminRoute";
+import Header from "./components/Header";
 import LoginPage from "./pages/LoginPage";
-import OrderForm from "./components/OrderForm";
-import OrderList from "./components/OrderList";
-import StockPanel from "./components/StockPanel";
+import Storefront from "./pages/Storefront";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import AdminPanel from "./pages/AdminPanel";
 import "./App.css";
 
-const Dashboard = () => {
-    const { user, logout } = useAuth();
-    const [refresh, setRefresh] = useState(0);
+const Layout = ({ children }: { children: React.ReactNode }) => (
+    <>
+        <Header />
+        <main className="content">{children}</main>
+    </>
+);
 
-    const handleOrderCreated = () => {
-        setRefresh(prev => prev + 1);
-    };
-
-    return (
-        <div className="app">
-            <header>
-                <div>
-                    <h1>🛒 Distributed E-Commerce Dashboard</h1>
-                    <p>Real-time order & inventory management</p>
-                </div>
-                <div className="header-user">
-                    <span>👤 {user?.email}</span>
-                    <button className="logout-btn" onClick={logout}>Logout</button>
-                </div>
-            </header>
-            <main>
-                <div className="left-panel">
-                    <StockPanel refresh={refresh} />
-                    <OrderForm onOrderCreated={handleOrderCreated} />
-                </div>
-                <div className="right-panel">
-                    <OrderList refresh={refresh} />
-                </div>
-            </main>
-        </div>
-    );
-};
-
-const App = () => {
-    return (
-        <AuthProvider>
+const App = () => (
+    <AuthProvider>
+        <CartProvider>
             <BrowserRouter>
                 <Routes>
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/" element={
-                        <PrivateRoute>
-                            <Dashboard />
-                        </PrivateRoute>
+                    <Route path="/" element={<Layout><Storefront /></Layout>} />
+                    <Route path="/product/:id" element={<Layout><ProductDetail /></Layout>} />
+                    <Route path="/cart" element={<Layout><Cart /></Layout>} />
+                    <Route path="/checkout" element={
+                        <PrivateRoute><Layout><Checkout /></Layout></PrivateRoute>
+                    } />
+                    <Route path="/admin" element={
+                        <AdminRoute><Layout><AdminPanel /></Layout></AdminRoute>
                     } />
                 </Routes>
             </BrowserRouter>
-        </AuthProvider>
-    );
-};
+        </CartProvider>
+    </AuthProvider>
+);
 
 export default App;

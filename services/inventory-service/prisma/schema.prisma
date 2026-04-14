@@ -9,12 +9,27 @@ datasource db {
 
 model OrderEvent {
   id         Int      @id @default(autoincrement())
-  orderId    String   @unique
+  orderId    String
   userId     String
   productId  String
   quantity   Int
   eventType  String
   createdAt  DateTime @default(now())
 
+  @@index([orderId])
   @@map("order_events")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  price       Float
+  stock       Int      @default(0)
+  imageUrl    String   @default("")
+  tags        String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
 }

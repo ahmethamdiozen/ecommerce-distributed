@@ -47,6 +47,26 @@ services:
       retries: 15
       start_period: 90s
 
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   auth-service:
     build:
       context: ../services/auth-service
@@ -56,9 +76,9 @@ services:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       REDIS_URL: ${REDIS_URL}
+      ADMIN_EMAILS: ${ADMIN_EMAILS}
     networks:
       - default
-      - coolify
     deploy:
       resources:
         limits:
@@ -85,7 +105,6 @@ services:
         condition: service_started
     networks:
       - default
-      - coolify
     deploy:
       resources:
         limits:
@@ -98,12 +117,24 @@ services:
     environment:
       KAFKA_BROKER: kafka:9092
       DATABASE_URL: ${INVENTORY_DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL}
     depends_on:
       kafka:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - default
-      - coolify
     deploy:
       resources:
         limits:
@@ -129,12 +160,15 @@ services:
       args:
         VITE_AUTH_URL: ""
         VITE_ORDER_URL: ""
+        VITE_INVENTORY_URL: ""
     restart: unless-stopped
     ports:
-      - "80"
+      - "80:80"
     depends_on:
       - auth-service
       - order-service
+    networks:
+      - default
     deploy:
       resources:
         limits:
@@ -143,8 +177,7 @@ services:
 volumes:
   kafka_data:
   rabbitmq_data:
+  minio_data:
 
 networks:
   default:
-  coolify:
-    external: true
