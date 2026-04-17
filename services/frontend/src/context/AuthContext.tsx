@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useState, type ReactNode } from "react";
 import axios from "axios";
 import { AUTH_URL } from "../config/api";
 
@@ -17,25 +18,15 @@ interface AuthContextType {
     loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const stored = localStorage.getItem("accessToken");
+    const storedUser = localStorage.getItem("user");
 
-    // On mount, restore session from localStorage
-    useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        const storedUser = localStorage.getItem("user");
-
-        if (token && storedUser) {
-            setAccessToken(token);
-            setUser(JSON.parse(storedUser));
-        }
-
-        setLoading(false);
-    }, []);
+    const [user, setUser] = useState<User | null>(storedUser ? JSON.parse(storedUser) : null);
+    const [accessToken, setAccessToken] = useState<string | null>(stored);
+    const [loading] = useState(false);
 
     const login = async (email: string, password: string) => {
         const res = await axios.post(`${AUTH_URL}/auth/login`, { email, password });
@@ -85,10 +76,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             {children}
         </AuthContext.Provider>
     );
-};
-
-export const useAuth = () => {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-    return ctx;
 };

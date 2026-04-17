@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useEffect, useState, type ReactNode } from "react";
 import type { CartItem, Product } from "../types";
 
 const STORAGE_KEY = "cart";
@@ -13,7 +14,7 @@ interface CartContextType {
     count: number;
 }
 
-const CartContext = createContext<CartContextType | null>(null);
+export const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [items, setItems] = useState<CartItem[]>(() => {
@@ -65,10 +66,4 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             {children}
         </CartContext.Provider>
     );
-};
-
-export const useCart = () => {
-    const ctx = useContext(CartContext);
-    if (!ctx) throw new Error("useCart must be used within CartProvider");
-    return ctx;
 };

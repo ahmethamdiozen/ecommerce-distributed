@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
@@ -23,8 +23,9 @@ const LoginPage = () => {
                 await register(email, password);
             }
             navigate("/");
-        } catch (err: any) {
-            setError(err.response?.data?.error || "Something went wrong");
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Something went wrong";
+            setError(msg);
         } finally {
             setLoading(false);
         }

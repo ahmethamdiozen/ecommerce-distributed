@@ -54,8 +54,9 @@ const AdminPanel = () => {
             }
             setForm(empty);
             await load();
-        } catch (err: any) {
-            setError(err.response?.data?.error || "Save failed");
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Save failed";
+            setError(msg);
         } finally {
             setBusy(false);
         }

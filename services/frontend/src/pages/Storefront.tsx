@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { INVENTORY_URL } from "../config/api";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 import type { Product } from "../types";
 
 const Storefront = () => {
@@ -12,7 +12,7 @@ const Storefront = () => {
     const [activeTag, setActiveTag] = useState<string | null>(null);
     const { add } = useCart();
 
-    const load = async () => {
+    const load = useCallback(async () => {
         setLoading(true);
         try {
             const res = await axios.get(`${INVENTORY_URL}/products`, {
@@ -22,9 +22,9 @@ const Storefront = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [search, activeTag]);
 
-    useEffect(() => { load(); }, [activeTag]);
+    useEffect(() => { load(); }, [load]);
 
     const allTags = useMemo(() => {
         const set = new Set<string>();

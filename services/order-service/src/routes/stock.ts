@@ -6,7 +6,7 @@ const router = Router();
 
 // Read-only. Stock is owned by inventory-service; mutate it there.
 router.get("/:productId", authenticate, async (req: AuthRequest, res: Response) => {
-    const result = await getStock(req.params.productId);
+    const result = await getStock(req.params.productId as string);
     res.status(200).json(result);
 });
 

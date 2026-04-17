@@ -19,25 +19,20 @@ interface OrderListProps {
 const OrderList = ({ refresh }: OrderListProps) => {
     const [orders, setOrders] = useState<Order[]>([]);
 
-    const fetchOrders = async () => {
-        const res = await api.get(`${ORDER_URL}/orders`);
-        setOrders(res.data.orders);
-    };
-
-    // Fetch on refresh trigger (new order placed)
     useEffect(() => {
-        fetchOrders();
+        let cancelled = false;
+        const run = async () => {
+            const res = await api.get(`${ORDER_URL}/orders`);
+            if (!cancelled) setOrders(res.data.orders);
+        };
+        run();
+        const interval = setInterval(run, 3000);
+        return () => { cancelled = true; clearInterval(interval); };
     }, [refresh]);
-
-    // Poll every 3 seconds to catch async updates from Kafka/inventory
-    useEffect(() => {
-        const interval = setInterval(fetchOrders, 3000);
-        return () => clearInterval(interval);
-    }, []);
 
     return (
         <div className="panel">
-            <h2>📋 Order History ({orders.length})</h2>
+            <h2>Order History ({orders.length})</h2>
             <div className="order-list">
                 {orders.map(order => (
                     <div key={order.id} className="order-item">
@@ -48,9 +43,9 @@ const OrderList = ({ refresh }: OrderListProps) => {
                             </span>
                         </div>
                         <div className="order-details">
-                            <span>👤 {order.userId}</span>
-                            <span>📦 {order.productId}</span>
-                            <span>🔢 x{order.quantity}</span>
+                            <span>{order.userId}</span>
+                            <span>{order.productId}</span>
+                            <span>x{order.quantity}</span>
                             <span className="event-type">{order.eventType}</span>
                         </div>
                     </div>

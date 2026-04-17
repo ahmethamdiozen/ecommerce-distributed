@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import api from "../config/axios";
 import { ORDER_URL } from "../config/api";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 
 const Checkout = () => {
     const { items, total, clear } = useCart();
-    const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState<string | null>(null);
@@ -21,8 +21,9 @@ const Checkout = () => {
             const res = await api.post(`${ORDER_URL}/orders`, payload);
             setSuccess(res.data.orderId || "ok");
             clear();
-        } catch (err: any) {
-            setError(err.response?.data?.error || err.response?.data?.message || "Order failed");
+        } catch (err: unknown) {
+            const msg = axios.isAxiosError(err) ? err.response?.data?.error || err.response?.data?.message : undefined;
+            setError(msg || "Order failed");
         } finally {
             setSubmitting(false);
         }

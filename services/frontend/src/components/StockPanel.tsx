@@ -38,7 +38,6 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
 
     const setStockExact = async (productId: string) => {
         const raw = setValues[productId];
-        // Do nothing if input is empty
         if (raw === undefined || raw === "") return;
         const qty = Number(raw);
         await api.post(`${ORDER_URL}/stock/${productId}`, { quantity: qty });
@@ -46,9 +45,8 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
         fetchStocks();
     };
 
-    useEffect(() => {
-        fetchStocks();
-    }, [refresh]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { fetchStocks(); }, [refresh]);
 
     const getStockColor = (stock: number) => {
         if (stock === 0) return "#ef4444";
@@ -58,7 +56,7 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
 
     return (
         <div className="panel">
-            <h2>📦 Stock Levels</h2>
+            <h2>Stock Levels</h2>
 
             <div className="seed-control">
                 <label>Amount:</label>
@@ -76,11 +74,11 @@ const StockPanel = ({ refresh }: StockPanelProps) => {
                         <div className="stock-info">
                             <span className="product-name">{p}</span>
                             <span className="stock-count" style={{ color: getStockColor(stocks[p] || 0) }}>
-                                {stocks[p] ?? "—"}
+                                {stocks[p] ?? "---"}
                             </span>
                         </div>
                         <div className="stock-actions">
-                            <button className="btn-subtract" onClick={() => subtractStock(p)}>−{seedQty}</button>
+                            <button className="btn-subtract" onClick={() => subtractStock(p)}>-{seedQty}</button>
                             <button className="btn-add" onClick={() => addStock(p)}>+{seedQty}</button>
                         </div>
                         <div className="stock-set">

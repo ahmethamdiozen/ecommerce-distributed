@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { INVENTORY_URL } from "../config/api";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 import type { Product } from "../types";
 
 const ProductDetail = () => {

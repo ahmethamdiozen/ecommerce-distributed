@@ -28,8 +28,9 @@ const OrderForm = ({ onOrderCreated }: OrderFormProps) => {
             });
             setStatus({ success: true, message: res.data.message });
             onOrderCreated();
-        } catch (err: any) {
-            setStatus({ success: false, message: err.response?.data?.error || "Order failed" });
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Order failed";
+            setStatus({ success: false, message: msg });
         } finally {
             setLoading(false);
         }
