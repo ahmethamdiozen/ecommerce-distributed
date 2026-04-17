@@ -40,7 +40,7 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
-    const product = await getProduct(req.params.id);
+    const product = await getProduct(req.params.id as string);
     if (!product) {
         res.status(404).json({ error: "Product not found" });
         return;
@@ -70,21 +70,22 @@ router.post("/", requireAdmin, upload.single("image"), async (req: Request, res:
             tags: parseTags(tags),
         });
         res.status(201).json({ success: true, product });
-    } catch (err: any) {
-        res.status(400).json({ error: err.message });
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Request failed";
+        res.status(400).json({ error: msg });
     }
 });
 
 router.put("/:id", requireAdmin, upload.single("image"), async (req: Request, res: Response) => {
     try {
-        const existing = await getProduct(req.params.id);
+        const existing = await getProduct(req.params.id as string);
         if (!existing) {
             res.status(404).json({ error: "Product not found" });
             return;
         }
 
         const { name, description, price, stock, tags } = req.body;
-        const data: any = {};
+        const data: Partial<{ name: string; description: string; price: number; stock: number; tags: string[]; imageUrl: string }> = {};
         if (name !== undefined) data.name = name;
         if (description !== undefined) data.description = description;
         if (price !== undefined) data.price = Number(price);
@@ -97,15 +98,16 @@ router.put("/:id", requireAdmin, upload.single("image"), async (req: Request, re
             oldImage = existing.imageUrl || undefined;
         }
 
-        const product = await updateProduct(req.params.id, data, oldImage);
+        const product = await updateProduct(req.params.id as string, data, oldImage);
         res.json({ success: true, product });
-    } catch (err: any) {
-        res.status(400).json({ error: err.message });
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Request failed";
+        res.status(400).json({ error: msg });
     }
 });
 
 router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
-    const product = await deleteProduct(req.params.id);
+    const product = await deleteProduct(req.params.id as string);
     if (!product) {
         res.status(404).json({ error: "Product not found" });
         return;
