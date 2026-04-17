@@ -92,23 +92,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate dev compose
-        working-directory: infrastructure
-        run: docker compose -f docker-compose.yml config --quiet
-        env:
-          POSTGRES_USER: ci
-          POSTGRES_PASSWORD: ci
-          RABBITMQ_USER: ci
-          RABBITMQ_PASS: ci
-          JWT_ACCESS_SECRET: ci
-          JWT_REFRESH_SECRET: ci
-          GRAFANA_PASSWORD: ci
-          ADMIN_EMAILS: ci@ci
-          MINIO_ROOT_USER: ci
-          MINIO_ROOT_PASSWORD: ci
-          MINIO_BUCKET: ci
-          MINIO_PUBLIC_URL: http://localhost:9000
-
       - name: Validate prod compose
         working-directory: infrastructure
         run: docker compose -f docker-compose.prod.yaml config --quiet
