@@ -4,5 +4,5 @@ COPY package*.json ./
 RUN npm install 
 COPY . .
 RUN npm install -g ts-node typescript
-EXPOSE 3001
+EXPOSE 3003
 CMD ["ts-node", "src/index.ts"]
