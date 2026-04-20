@@ -17,3 +17,8 @@ scrape_configs:
   - job_name: "notification-service"
     static_configs:
       - targets: ["notification-service:3003"]
+
+  - job_name: "minio"
+    metrics_path: /minio/v2/metrics/cluster
+    static_configs:
+      - targets: ["minio:9000"]
