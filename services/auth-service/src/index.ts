@@ -12,6 +12,8 @@ app.use(express.json());
 app.use("/auth", authRouter);
 
 // Prometheus scrape endpoint
+app.get("/health", (_req, res) => { res.json({ status: "ok", service: "auth-service" }); });
+
 app.get("/metrics", async (req, res) => {
     res.set("Content-Type", register.contentType);
     res.end(await register.metrics());

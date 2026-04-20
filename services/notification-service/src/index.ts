@@ -5,7 +5,8 @@ import { register } from "./config/metrics";
 const app = express();
 const PORT = 3003;
 
-// Prometheus scrape endpoint
+app.get("/health", (_req, res) => { res.json({ status: "ok", service: "notification-service" }); });
+
 app.get("/metrics", async (req, res) => {
     res.set("Content-Type", register.contentType);
     res.end(await register.metrics());
