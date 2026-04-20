@@ -1,6 +1,7 @@
 import { prisma } from "../config/database";
 import redis from "../config/redis";
 import { deleteImageByUrl } from "../config/minio";
+import { productOpsCounter } from "../config/metrics";
 
 const stockKey = (id: string) => `stock:${id}`;
 
@@ -32,6 +33,7 @@ export const createProduct = async (data: {
         },
     });
     await redis.set(stockKey(product.id), product.stock);
+    productOpsCounter.inc({ operation: "create", status: "success" });
     return product;
 };
 
@@ -47,6 +49,7 @@ export const updateProduct = async (
     if (oldImageToReplace) {
         await deleteImageByUrl(oldImageToReplace);
     }
+    productOpsCounter.inc({ operation: "update", status: "success" });
     return product;
 };
 
@@ -56,5 +59,6 @@ export const deleteProduct = async (id: string) => {
     await prisma.product.delete({ where: { id } });
     await redis.del(stockKey(id));
     if (product.imageUrl) await deleteImageByUrl(product.imageUrl);
+    productOpsCounter.inc({ operation: "delete", status: "success" });
     return product;
 };
