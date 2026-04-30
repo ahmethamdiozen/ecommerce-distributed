@@ -7,23 +7,23 @@ TypeScript ile yazılmış, mikroservis tabanlı bir e-ticaret sistemi. Servisle
 ## Mimari
 
 ```
-                         ┌─────────────────┐
+                         ┌──────────────────┐
                          │    Frontend      │
                          │  React + Nginx   │
                          └────────┬─────────┘
                                   │
-              ┌───────────────────┼───────────────────┐
-              │                   │                   │
-     ┌────────▼────────┐ ┌───────▼───────┐ ┌─────────▼────────┐
-     │  Auth Servisi    │ │ Sipariş Serv. │ │ Envanter Servisi  │
-     │   (Port 3001)    │ │  (Port 3000)  │ │   (Port 3002)     │
-     └──┬──────────┬────┘ └──┬─────┬──┬──┘ └──┬───┬────┬───┬──┘
-        │          │         │     │  │        │   │    │   │
-     Postgres    Redis    Redis  Kafka RMQ  Postgres Redis MinIO
+              ┌───────────────────┼─────────────────────┐
+              │                   │                     │
+     ┌────────▼─────────┐ ┌───────▼─────────┐ ┌─────────▼────────┐
+     │  Auth Servisi    │ │ Sipariş Servisi │ │ Envanter Servisi │
+     │   (Port 3001)    │ │  (Port 3000)    │ │   (Port 3002)    │
+     └──┬──────────┬────┘ └──┬─────┬──┬─────┘ └──┬────────┬──────┘
+        │          │         │     │  │          │        │   
+     Postgres    Redis    Redis  Kafka RMQ    Postgres   Redis 
                                   │     │              │
                                   ▼     ▼         Kafka│
                            ┌──────────────┐            │
-                           │ Bildirim     │◄───────────┘
+                           │   Bildirim   │◄───────────┘
                            │   Servisi    │
                            └──────────────┘
 

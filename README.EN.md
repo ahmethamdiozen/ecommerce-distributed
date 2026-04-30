@@ -7,19 +7,19 @@ A microservices-based e-commerce system written in TypeScript. Services run inde
 ## Architecture
 
 ```
-                         ┌─────────────────┐
+                         ┌──────────────────┐
                          │    Frontend      │
                          │  React + Nginx   │
                          └────────┬─────────┘
                                   │
               ┌───────────────────┼───────────────────┐
               │                   │                   │
-     ┌────────▼────────┐ ┌───────▼───────┐ ┌─────────▼────────┐
+     ┌────────▼─────────┐ ┌───────▼───────┐ ┌─────────▼─────────┐
      │  Auth Service    │ │ Order Service │ │ Inventory Service │
      │   (Port 3001)    │ │  (Port 3000)  │ │   (Port 3002)     │
-     └──┬──────────┬────┘ └──┬─────┬──┬──┘ └──┬───┬────┬───┬──┘
-        │          │         │     │  │        │   │    │   │
-     Postgres    Redis    Redis  Kafka RMQ  Postgres Redis MinIO
+     └──┬──────────┬────┘ └──┬─────┬────┬─┘ └──┬────────┬───────┘
+        │          │         │     │    │      │        │  
+     Postgres    Redis    Redis  Kafka RMQ  Postgres  Redis
                                   │     │              │
                                   ▼     ▼         Kafka│
                            ┌──────────────┐            │
