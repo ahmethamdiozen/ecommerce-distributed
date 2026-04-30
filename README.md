@@ -96,7 +96,3 @@ Her `main` dalına push'ta GitHub Actions çalışır:
 2. Frontend için ESLint + Vite build
 3. 5 Dockerfile için Docker build
 4. Production compose dosyası doğrulaması
-
-## Lisans
-
-Eğitim ve tanıtım amaçlıdır.
