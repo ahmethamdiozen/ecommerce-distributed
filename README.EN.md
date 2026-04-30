@@ -7,19 +7,19 @@ A microservices-based distributed e-commerce system built with TypeScript, demon
 ## Architecture
 
 ```
-                         ┌─────────────────┐
+                         ┌──────────────────┐
                          │    Frontend      │
                          │  React + Nginx   │
                          └────────┬─────────┘
                                   │
               ┌───────────────────┼───────────────────┐
               │                   │                   │
-     ┌────────▼────────┐ ┌───────▼───────┐ ┌─────────▼────────┐
+     ┌────────▼─────────┐ ┌───────▼───────┐ ┌─────────▼─────────┐
      │  Auth Service    │ │ Order Service │ │ Inventory Service │
      │   (Port 3001)    │ │  (Port 3000)  │ │   (Port 3002)     │
-     └──┬──────────┬────┘ └──┬─────┬──┬──┘ └──┬───┬────┬───┬──┘
-        │          │         │     │  │        │   │    │   │
-     Postgres    Redis    Redis  Kafka RMQ  Postgres Redis MinIO
+     └──┬──────────┬────┘ └──┬─────┬────┬─┘ └──┬────────┬───────┘
+        │          │         │     │    │      │        │  
+     Postgres    Redis    Redis  Kafka RMQ  Postgres  Redis
                                   │     │              │
                                   ▼     ▼         Kafka│
                            ┌──────────────┐            │
@@ -96,7 +96,3 @@ GitHub Actions on every push to `main`:
 2. ESLint + Vite build for frontend
 3. Docker build for all 5 Dockerfiles
 4. Validate production compose file
-
-## License
-
-Educational and demonstration purposes.
