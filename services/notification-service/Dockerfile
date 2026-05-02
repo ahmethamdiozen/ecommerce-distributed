@@ -1,8 +1,14 @@
-FROM node:24-alpine
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm install 
+RUN npm ci
 COPY . .
-RUN npm install -g ts-node typescript
+RUN npm run build
+
+FROM node:24-alpine AS runner
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/dist ./dist
 EXPOSE 3003
-CMD ["ts-node", "src/index.ts"]
+CMD ["node", "dist/index.js"]
